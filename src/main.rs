@@ -1,29 +1,30 @@
 use std::convert::Infallible;
 use std::net::SocketAddr;
-use hyper::{Body, Request, Response, Server};
+use hyper::{Body, Request, Response, Server, Method};
+use hyper::body;
 use hyper::service::{make_service_fn, service_fn};
 use log::{debug, error, log_enabled, info, Level};
 use env_logger::Env;
+use serde::{Serialize, Deserialize};
+use futures::TryStreamExt; // 0.3.7
 
 
 
-async fn hello_world(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
+async fn echo(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
     info!("Got {:?}", _req);
-    Ok(Response::new(format!("{:?}",_req.into_parts()).into()))
+    let (parts, body) = _req.into_parts();
+
+    Ok(Response::new(format!("{:?}, {:?}",parts, body::to_bytes(body).await).into()))
 }
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    // We'll bind to 127.0.0.1:3100
     let port = 3100;
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
-    // A `Service` is needed for every connection, so this
-    // creates one from our `hello_world` function.
     let make_svc = make_service_fn(|_conn| async {
-        // service_fn converts our function into a `Service`
-        Ok::<_, Infallible>(service_fn(hello_world))
+        Ok::<_, Infallible>(service_fn(echo))
     });
 
     let server = Server::bind(&addr).serve(make_svc);
