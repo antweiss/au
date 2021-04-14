@@ -3,10 +3,10 @@ use std::net::SocketAddr;
 use hyper::{Body, Request, Response, Server, Method};
 use hyper::body;
 use hyper::service::{make_service_fn, service_fn};
-use log::{debug, error, log_enabled, info, Level};
+use log::{info};
 use env_logger::Env;
-use serde::{Serialize, Deserialize};
-use futures::TryStreamExt; // 0.3.7
+//use serde::{Serialize, Deserialize};
+//use futures::TryStreamExt; // 0.3.7
 
 
 
@@ -14,7 +14,7 @@ async fn echo(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
     info!("Got {:?}", _req);
     let (parts, body) = _req.into_parts();
 
-    Ok(Response::new(format!("{:?}, {:?}",parts, body::to_bytes(body).await).into()))
+    Ok(Response::new(format!("{:?}, {{\"json\" : {}}}\"",parts, String::from_utf8(body::to_bytes(body).await.unwrap().to_vec()).unwrap()).into()))
 }
 
 #[tokio::main]
