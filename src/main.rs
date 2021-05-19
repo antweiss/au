@@ -13,8 +13,21 @@ use env_logger::Env;
 async fn echo(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
     info!("Got {:?}", _req);
     let (parts, body) = _req.into_parts();
+    //convert body to a vec
+    let body_vec = body::to_bytes(body).await.unwrap().to_vec();
 
-    Ok(Response::new(format!("{:?}, {{\"json\" : {}}}\"",parts, String::from_utf8(body::to_bytes(body).await.unwrap().to_vec()).unwrap()).into()))
+    Ok(Response::new(format!("{{\"method\" : \"{}\",\n\
+                            \"uri\" : \"{}\",\n\
+                            \"headers\" : {:?},\n\
+                            \"version\" : \"{:?}\",\n\
+                            \"body\" : {}}}",
+                    parts.method,
+                    parts.uri,
+                    parts.headers,
+                    parts.version,
+                    if !body_vec.is_empty() { String::from_utf8(body_vec).unwrap()} 
+                    else { "none".to_string() } )
+                        .into()))
 }
 
 #[tokio::main]

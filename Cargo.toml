@@ -1,5 +1,5 @@
 [package]
-name = "rust-async"
+name = "au"
 version = "0.1.0"
 authors = ["Anton Weiss <anton@otomato.io>"]
 edition = "2018"
