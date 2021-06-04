@@ -37,5 +37,5 @@ jobs:
       with:
         file: ./Dockerfile
         context: ./
-        push: otomato/au:latest
-        tags: ${{ github.sha }}
+        push: true
+        tags: otomato/au:latest, otomato/au:${{ github.sha }}
