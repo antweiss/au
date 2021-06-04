@@ -20,3 +20,23 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+#Login to registry that will hold the image
+  docker:
+    - name: Login to docker-otomato
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+#       # Build and push image for Dockerfile
+      - name: Build and push image for Dockerfile
+        uses: docker/build-push-action@v2
+        with:
+          file: ./Dockerfile
+          context: ./
+          push: otomato/au:latest
+          tags: ${GITHUB_REF#refs/heads/}
