@@ -26,7 +26,7 @@ async fn echo(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
                     parts.headers,
                     parts.version,
                     if !body_vec.is_empty() { String::from_utf8(body_vec).unwrap()} 
-                    else { "none".to_string() } )
+                    else { "\"none\"".to_string() } )
                         .into()))
 }
 
